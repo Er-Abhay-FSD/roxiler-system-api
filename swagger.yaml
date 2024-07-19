@@ -1,0 +1,354 @@
+openapi: 3.0.0
+info:
+  title: Roxiler System MERN Stack Coding Challenge API
+  version: 1.0.0
+  description: |
+    📚 **API Documentation for the MERN Stack Coding Challenge** - 
+    This API provides endpoints for managing transactions, retrieving statistics, and generating charts in the Roxiler system.
+servers:
+  - url: http://localhost:5000
+    description: 🌐 Base URL for the API server
+
+paths:
+  /api/initialize:
+    get:
+      summary: 🗃️ Initialize the database with seed data
+      responses:
+        '201':
+          description: 🎉 Database initialized with seed data
+        '500':
+          description: ❌ Error initializing the database
+
+  /api/transactions:
+    get:
+      summary: 📋 List all transactions with search and pagination
+      parameters:
+        - name: page
+          in: query
+          description: 🔢 Page number for pagination
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          description: 📄 Number of transactions per page
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          description: 🔍 Search text to match on title/description/price
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ✅ List of transactions with search and pagination
+        '500':
+          description: ❌ Error retrieving transactions
+
+  /api/stats:
+    get:
+      summary: 📊 Get statistics for a selected year and month range
+      description: |
+        Retrieves total sales, total sold items, and total not sold items for a specified year and month range.
+      parameters:
+        - name: startYear
+          in: query
+          description: 📅 Start year to get statistics for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: startMonth
+          in: query
+          description: 🗓️ Start month to get statistics for (e.g., `01` for January). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+        - name: endYear
+          in: query
+          description: 📅 End year to get statistics for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: endMonth
+          in: query
+          description: 🗓️ End month to get statistics for (e.g., `01` for January). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+      responses:
+        '200':
+          description: ✅ Statistics for the selected year and month range
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatsResponse'
+        '400':
+          description: ❌ Invalid year or month format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid year or month format. Use YYYY and MM format.'
+        '500':
+          description: ❌ Error retrieving statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error retrieving statistics'
+
+  /api/barchart:
+    get:
+      summary: 📈 Get bar chart data for price ranges
+      parameters:
+        - name: startYear
+          in: query
+          description: 📅 Start year to get bar chart data for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: startMonth
+          in: query
+          description: 🗓️ Start month to get bar chart data for (e.g., `08` for August). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+        - name: endYear
+          in: query
+          description: 📅 End year to get bar chart data for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: endMonth
+          in: query
+          description: 🗓️ End month to get bar chart data for (e.g., `08` for August). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+      responses:
+        '200':
+          description: ✅ Bar chart data for price ranges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BarChartData'
+        '400':
+          description: ❌ Invalid month format
+        '500':
+          description: ❌ Error retrieving bar chart data
+
+  /api/piechart:
+    get:
+      summary: 🥧 Get pie chart data for categories
+      parameters:
+        - name: startYear
+          in: query
+          description: 📅 Start year to get pie chart data for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: startMonth
+          in: query
+          description: 🗓️ Start month to get pie chart data for (e.g., `08` for August). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+        - name: endYear
+          in: query
+          description: 📅 End year to get pie chart data for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: endMonth
+          in: query
+          description: 🗓️ End month to get pie chart data for (e.g., `08` for August). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+      responses:
+        '200':
+          description: ✅ Pie chart data for categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PieChartData'
+        '400':
+          description: ❌ Invalid month format
+        '500':
+          description: ❌ Error retrieving pie chart data
+
+  /api/combined:
+    get:
+      summary: 🔗 Get combined data from all endpoints
+      parameters:
+        - name: startYear
+          in: query
+          description: 📅 Start year to get combined data for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: startMonth
+          in: query
+          description: 🗓️ Start month to get combined data for (e.g., `08` for August). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+        - name: endYear
+          in: query
+          description: 📅 End year to get combined data for (e.g., `2024`). Use the format `YYYY`.
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}$'
+            example: '2024'
+        - name: endMonth
+          in: query
+          description: 🗓️ End month to get combined data for (e.g., `08` for August). Use the format `MM`.
+          required: true
+          schema:
+            type: string
+            pattern: '^(0[1-9]|1[0-2])$'
+            example: '08'
+      responses:
+        '200':
+          description: ✅ Combined data from all APIs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                  stats:
+                    type: array
+                    items:
+                      type: object
+                  barChart:
+                    type: array
+                    items:
+                      type: object
+                  pieChart:
+                    type: array
+                    items:
+                      type: object
+        '400':
+          description: ❌ Invalid month format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid month format. Use MM format.'
+        '500':
+          description: ❌ Error retrieving combined data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error retrieving combined data'
+components:
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        dateOfSale:
+          type: string
+          format: date-time
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        category:
+          type: string
+        sold:
+          type: boolean
+      example:
+        dateOfSale: '2024-01-01T00:00:00Z'
+        title: 'Sample Transaction'
+        description: 'This is a sample transaction description.'
+        price: 100
+        category: 'Electronics'
+        sold: true
+
+    StatsResponse:
+      type: object
+      properties:
+        totalSales:
+          type: number
+        totalSoldItems:
+          type: number
+        totalNotSoldItems:
+          type: number
+      example:
+        totalSales: 1000
+        totalSoldItems: 100
+        totalNotSoldItems: 50
+
+    BarChartData:
+      type: object
+      properties:
+        priceRange:
+          type: string
+        count:
+          type: number
+      example:
+        priceRange: '0-100'
+        count: 10
+
+    PieChartData:
+      type: object
+      properties:
+        category:
+          type: string
+        count:
+          type: number
+      example:
+        category: 'Electronics'
+        count: 20
